@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 500px;
+        }
+
+        .controls {
+            background: #fafafa;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h3 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #333;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .file-input-wrapper {
+            border: 2px dashed #ccc;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: #999;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .field input, .field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .checkbox-field {
+            margin: 10px 0;
+        }
+
+        .checkbox-field input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .checkbox-field label {
+            display: inline;
+            text-transform: none;
+            font-weight: normal;
+            color: #333;
+        }
+
+        .download-btn {
+            width: 100%;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background: #555;
+        }
+
+        .download-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .preview-area {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .canvas-container {
+            text-align: center;
+        }
+
+        #memeCanvas {
+            max-width: 100%;
+            max-height: 500px;
+            border: 1px solid #ddd;
+        }
+
+        .placeholder {
+            color: #999;
+            font-size: 16px;
+            padding: 100px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Meme Generator</h1>
+            <p>Upload image, add text, download</p>
+        </div>
+        
+        <div class="content">
+            <div class="controls">
+                <div class="section">
+                    <h3>Image Upload</h3>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="imageInput" accept="image/*">
+                        <div>Click to upload image</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Text Content</h3>
+                    <div class="field">
+                        <label for="topText">Top Text</label>
+                        <input type="text" id="topText" placeholder="Top text">
+                    </div>
+                    <div class="field">
+                        <label for="bottomText">Bottom Text</label>
+                        <input type="text" id="bottomText" placeholder="Bottom text">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Text Style</h3>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="fontSize">Size</label>
+                            <select id="fontSize">
+                                <option value="20">Small</option>
+                                <option value="30">Medium</option>
+                                <option value="40" selected>Large</option>
+                                <option value="50">X-Large</option>
+                                <option value="60">XX-Large</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="textColor">Color</label>
+                            <input type="color" id="textColor" value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="fontFamily">Font</label>
+                        <select id="fontFamily">
+                            <option value="Impact">Impact</option>
+                            <option value="Arial Black">Arial Black</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Comic Sans MS">Comic Sans</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Text Background</h3>
+                    <div class="checkbox-field">
+                        <input type="checkbox" id="enableBackground">
+                        <label for="enableBackground">Add background behind text</label>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="bgColor">Background Color</label>
+                            <input type="color" id="bgColor" value="#000000">
+                        </div>
+                        <div class="field">
+                            <label for="bgOpacity">Opacity</label>
+                            <select id="bgOpacity">
+                                <option value="0.3">30%</option>
+                                <option value="0.5">50%</option>
+                                <option value="0.7" selected>70%</option>
+                                <option value="0.9">90%</option>
+                                <option value="1.0">100%</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn" disabled>Download Meme</button>
+            </div>
+            
+            <div class="preview-area">
+                <div class="canvas-container">
+                    <canvas id="memeCanvas" style="display: none;"></canvas>
+                    <div class="placeholder" id="placeholder">
+                        Upload an image to start
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('memeCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageInput = document.getElementById('imageInput');
+        const topTextInput = document.getElementById('topText');
+        const bottomTextInput = document.getElementById('bottomText');
+        const textColorInput = document.getElementById('textColor');
+        const fontSizeInput = document.getElementById('fontSize');
+        const fontFamilyInput = document.getElementById('fontFamily');
+        const enableBackgroundInput = document.getElementById('enableBackground');
+        const bgColorInput = document.getElementById('bgColor');
+        const bgOpacityInput = document.getElementById('bgOpacity');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const placeholder = document.getElementById('placeholder');
+
+        let currentImage = null;
+
+        // Event listeners
+        imageInput.addEventListener('change', handleImageUpload);
+        topTextInput.addEventListener('input', updateMeme);
+        bottomTextInput.addEventListener('input', updateMeme);
+        textColorInput.addEventListener('change', updateMeme);
+        fontSizeInput.addEventListener('change', updateMeme);
+        fontFamilyInput.addEventListener('change', updateMeme);
+        enableBackgroundInput.addEventListener('change', updateMeme);
+        bgColorInput.addEventListener('change', updateMeme);
+        bgOpacityInput.addEventListener('change', updateMeme);
+        downloadBtn.addEventListener('click', downloadMeme);
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    setupCanvas();
+                    updateMeme();
+                    canvas.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    downloadBtn.disabled = false;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setupCanvas() {
+            if (!currentImage) return;
+            
+            const maxWidth = 600;
+            const maxHeight = 600;
+            
+            let { width, height } = currentImage;
+            
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+            
+            if (height > maxHeight) {
+                width = (width * maxHeight) / height;
+                height = maxHeight;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        function updateMeme() {
+            if (!currentImage) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            
+            const fontSize = parseInt(fontSizeInput.value);
+            const fontFamily = fontFamilyInput.value;
+            const textColor = textColorInput.value;
+            const enableBg = enableBackgroundInput.checked;
+            const bgColor = bgColorInput.value;
+            const bgOpacity = parseFloat(bgOpacityInput.value);
+            
+            ctx.font = `bold ${fontSize}px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            
+            // Draw top text
+            const topText = topTextInput.value.toUpperCase();
+            if (topText) {
+                drawTextWithBackground(topText, canvas.width / 2, 20, 'top', fontSize, textColor, enableBg, bgColor, bgOpacity);
+            }
+            
+            // Draw bottom text
+            const bottomText = bottomTextInput.value.toUpperCase();
+            if (bottomText) {
+                const lines = wrapText(bottomText, canvas.width - 40);
+                const startY = canvas.height - (lines.length * fontSize * 1.2) - 20;
+                drawTextWithBackground(bottomText, canvas.width / 2, startY, 'bottom', fontSize, textColor, enableBg, bgColor, bgOpacity);
+            }
+        }
+
+        function drawTextWithBackground(text, x, y, position, fontSize, textColor, enableBg, bgColor, bgOpacity) {
+            const lines = wrapText(text, canvas.width - 40);
+            const lineHeight = fontSize * 1.2;
+            const padding = 8;
+            
+            if (enableBg) {
+                // Calculate background dimensions
+                let maxWidth = 0;
+                lines.forEach(line => {
+                    const width = ctx.measureText(line).width;
+                    if (width > maxWidth) maxWidth = width;
+                });
+                
+                const bgWidth = maxWidth + (padding * 2);
+                const bgHeight = (lines.length * lineHeight) + (padding * 2);
+                const bgX = x - (bgWidth / 2);
+                const bgY = position === 'top' ? y - padding : y - padding;
+                
+                // Draw background
+                ctx.save();
+                ctx.fillStyle = bgColor;
+                ctx.globalAlpha = bgOpacity;
+                ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
+                ctx.restore();
+            }
+            
+            // Draw text
+            ctx.fillStyle = textColor;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            
+            lines.forEach((line, index) => {
+                const lineY = y + (index * lineHeight) + fontSize;
+                ctx.strokeText(line, x, lineY);
+                ctx.fillText(line, x, lineY);
+            });
+        }
+
+        function wrapText(text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            for (let word of words) {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+            
+            return lines;
+        }
+
+        function downloadMeme() {
+            if (!currentImage) return;
+
+            const link = document.createElement('a');
+            link.download = 'meme.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
