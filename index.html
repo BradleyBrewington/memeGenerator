@@ -174,6 +174,7 @@
             max-width: 100%;
             max-height: 500px;
             border: 1px solid #ddd;
+            object-fit: contain;
         }
 
         .placeholder {
@@ -342,23 +343,13 @@
         function setupCanvas() {
             if (!currentImage) return;
             
-            const maxWidth = 600;
-            const maxHeight = 600;
+            // Use original image dimensions for better quality
+            canvas.width = currentImage.width;
+            canvas.height = currentImage.height;
             
-            let { width, height } = currentImage;
-            
-            if (width > maxWidth) {
-                height = (height * maxWidth) / width;
-                width = maxWidth;
-            }
-            
-            if (height > maxHeight) {
-                width = (width * maxHeight) / height;
-                height = maxHeight;
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
+            // Improve canvas rendering quality
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
         }
 
         function updateMeme() {
@@ -459,7 +450,8 @@
 
             const link = document.createElement('a');
             link.download = 'meme.png';
-            link.href = canvas.toDataURL();
+            // Use maximum quality for download
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }
     </script>
