@@ -73,6 +73,7 @@
             text-align: center;
             cursor: pointer;
             background: white;
+            position: relative;
         }
 
         .file-input-wrapper:hover {
@@ -81,9 +82,11 @@
 
         .file-input-wrapper input[type="file"] {
             position: absolute;
-            opacity: 0;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
+            opacity: 0;
             cursor: pointer;
         }
 
